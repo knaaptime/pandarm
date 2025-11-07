@@ -67,7 +67,7 @@
 
        - name: run tests
          run: |
-           pytest pandarm \
+           pytest tests \
            -v \
            -r a \
            -n auto \
