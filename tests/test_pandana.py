@@ -193,7 +193,7 @@ def test_non_float_node_values(sample_osm):
     ssize = 50
     net.set(
         random_node_ids(sample_osm, ssize),
-        variable=(random_data(ssize) * 100).astype(np.uint64),
+        variable=(random_data(ssize) * 100).astype(np.int64),
     )
 
     for type in net.aggregations:

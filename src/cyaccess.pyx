@@ -53,7 +53,7 @@ cdef np.ndarray[double, ndim = 2] convert_2D_vector_to_array_dbl(
 
 cdef np.ndarray[int, ndim = 2] convert_2D_vector_to_array_int(
         vector[vector[int32_t]] vec):
-    cdef np.ndarray arr = np.empty_like(vec, dtype=np.uint64)
+    cdef np.ndarray arr = np.empty_like(vec, dtype=np.int64)
     for i in range(arr.shape[0]):
         for j in range(arr.shape[1]):
             arr[i][j] = vec[i][j]
