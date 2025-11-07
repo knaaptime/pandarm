@@ -107,9 +107,9 @@ cdef class cyaccess:
     def find_all_nearest_pois(
         self,
         double radius,
-        int32_t num_of_pois,
+        int64_t num_of_pois,
         string category,
-        int32_t impno=0
+        int64_t impno=0
     ):
         """
         radius - search radius
@@ -149,7 +149,7 @@ cdef class cyaccess:
         category,
         aggtyp,
         decay,
-        int32_t impno=0,
+        int64_t impno=0,
     ):
         """
         radius - search radius
@@ -163,7 +163,7 @@ cdef class cyaccess:
 
         return convert_vector_to_array_dbl(ret)
 
-    def shortest_path(self, int32_t srcnode, int32_t destnode, int32_t impno=0):
+    def shortest_path(self, int64_t srcnode, int64_t destnode, int64_t impno=0):
         """
         srcnode - node id origin
         destnode - node id destination
@@ -172,7 +172,7 @@ cdef class cyaccess:
         return self.access.Route(srcnode, destnode, impno)
 
     def shortest_paths(self, np.ndarray[int64_t] srcnodes, 
-            np.ndarray[int64_t] destnodes, int32_t impno=0):
+            np.ndarray[int64_t] destnodes, int64_t impno=0):
         """
         srcnodes - node ids of origins
         destnodes - node ids of destinations
@@ -180,7 +180,7 @@ cdef class cyaccess:
         """
         return self.access.Routes(srcnodes, destnodes, impno)
 
-    def shortest_path_distance(self, int32_t srcnode, int32_t destnode, int32_t impno=0):
+    def shortest_path_distance(self, int64_t srcnode, int64_t destnode, int64_t impno=0):
         """
         srcnode - node id origin
         destnode - node id destination
@@ -189,7 +189,7 @@ cdef class cyaccess:
         return self.access.Distance(srcnode, destnode, impno)
 
     def shortest_path_distances(self, np.ndarray[int64_t] srcnodes, 
-            np.ndarray[int64_t] destnodes, int32_t impno=0):
+            np.ndarray[int64_t] destnodes, int64_t impno=0):
         """
         srcnodes - node ids of origins
         destnodes - node ids of destinations
