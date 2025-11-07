@@ -62,7 +62,7 @@ class Network:
         # in the c extension are actually indexes ordered from 0 to numnodes-1
         # node IDs are thus translated back and forth in the python layer,
         # which allows non-integer node IDs as well
-        self.node_idx = pd.Series(np.arange(len(nodes_df), dtype=np.uint64), index=nodes_df.index)
+        self.node_idx = pd.Series(np.arange(len(nodes_df), dtype=np.int64), index=nodes_df.index)
 
         edges = pd.concat(
             [self._node_indexes(edges_df["from"]), self._node_indexes(edges_df["to"])],
@@ -362,7 +362,7 @@ class Network:
 
         self.net.initialize_access_var(
             name.encode("utf-8"),
-            df.node_idx.values.astype(np.uint64),
+            df.node_idx.values.astype(np.int64),
             df[name].values.astype("double"),
         )
 
@@ -780,7 +780,7 @@ class Network:
                 # initialized as a pandas.Series - this really is pandas-like
                 # thinking.  it's complicated on the inside, but quite
                 # intuitive to the user I think
-                s = df2[col].astype(np.uint64)
+                s = df2[col].astype(np.int64)
                 df2[col] = self.poi_category_indexes[category].values[s]
                 df2.loc[s == -1, col] = np.nan
 
