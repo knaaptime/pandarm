@@ -1,0 +1,63 @@
+[build-system]
+# Requirements for building the compiled package
+build-backend = "setuptools.build_meta"
+requires = ["wheel", "setuptools >=40.8", "setuptools_scm[toml]>=6.2", "cython >=3", "numpy >=2.0"]
+
+[project]
+name = "pandarm"
+dynamic = ["version"]
+dependencies = [
+        "numpy >=2",
+        "pandas >=2",
+        "requests >=2.0",
+        "scikit-learn >=0.18",
+        "tables >=3.1",
+]
+classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
+]
+license = { text = "AGPL" }
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["pandarm", "src"]
+exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
+
+[project.optional-dependencies]
+dev = [
+        "pre-commit",
+        "coveralls",
+        "numpydoc",
+        "pycodestyle",
+        "pytest>=3.6,<4.0",
+        "pytest-cov<2.10",
+        "sphinx",
+        "sphinx_rtd_theme",
+        "osmnx"
+]
+docs = [
+        "nbsphinx",
+        "numpydoc",
+        "pandoc",
+        "sphinx",
+        "sphinxcontrib-bibtex",
+        "sphinx_bootstrap_theme",
+        "mkdocs-jupyter",
+        "myst-parser",
+        "linkify-it-py",
+        "sphinx-autodoc2",
+        "nbsphinx-link>=1.3.1",
+]
+tests = [
+        "codecov",
+        "coverage",
+        "pytest",
+        "pytest-mpl",
+        "pytest-cov",
+        "pytest-xdist",
+]
+
+[tool.ruff]
+ignore = ["E226","E402"]
+line-length = 100

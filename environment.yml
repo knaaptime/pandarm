@@ -1,0 +1,11 @@
+name: pandarm
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - numpy >=2
+  - pandas >=2
+  - requests >=2.0
+  - scikit-learn >=0.18
+  - pytables >=3.1
+  - cxx-compiler  # platform-appropriate compiler w/ OpenMP
