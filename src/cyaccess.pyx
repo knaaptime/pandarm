@@ -5,7 +5,7 @@ from libcpp cimport bool
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp.pair cimport pair
-from libc.stdint cimport int32_t, uint64_t
+from libc.stdint cimport int32_t, int64_t
 
 import numpy as np
 cimport numpy as np
@@ -65,9 +65,9 @@ cdef class cyaccess:
 
     def __cinit__(
         self,
-        np.ndarray[uint64_t] node_ids,
+        np.ndarray[int64_t] node_ids,
         np.ndarray[double, ndim=2] node_xys,
-        np.ndarray[uint64_t, ndim=2] edges,
+        np.ndarray[int64_t, ndim=2] edges,
         np.ndarray[double, ndim=2] edge_weights,
         bool twoway=True
     ):
@@ -92,7 +92,7 @@ cdef class cyaccess:
         double maxdist,
         int maxitems,
         string category,
-        np.ndarray[uint64_t] node_ids
+        np.ndarray[int64_t] node_ids
     ):
         """
         maxdist - the maximum distance that will later be used in
@@ -127,7 +127,7 @@ cdef class cyaccess:
     def initialize_access_var(
         self,
         string category,
-        np.ndarray[uint64_t] node_ids,
+        np.ndarray[int64_t] node_ids,
         np.ndarray[double] values
     ):
         """
@@ -171,8 +171,8 @@ cdef class cyaccess:
         """
         return self.access.Route(srcnode, destnode, impno)
 
-    def shortest_paths(self, np.ndarray[uint64_t] srcnodes, 
-            np.ndarray[uint64_t] destnodes, int32_t impno=0):
+    def shortest_paths(self, np.ndarray[int64_t] srcnodes, 
+            np.ndarray[int64_t] destnodes, int32_t impno=0):
         """
         srcnodes - node ids of origins
         destnodes - node ids of destinations
@@ -188,8 +188,8 @@ cdef class cyaccess:
         """
         return self.access.Distance(srcnode, destnode, impno)
 
-    def shortest_path_distances(self, np.ndarray[uint64_t] srcnodes, 
-            np.ndarray[uint64_t] destnodes, int32_t impno=0):
+    def shortest_path_distances(self, np.ndarray[int64_t] srcnodes, 
+            np.ndarray[int64_t] destnodes, int32_t impno=0):
         """
         srcnodes - node ids of origins
         destnodes - node ids of destinations
@@ -200,8 +200,8 @@ cdef class cyaccess:
     def precompute_range(self, double radius):
         self.access.precomputeRangeQueries(radius)
 
-    def nodes_in_range(self, vector[long] srcnodes, float radius, uint64_t impno, 
-            np.ndarray[uint64_t] ext_ids):
+    def nodes_in_range(self, vector[long] srcnodes, float radius, int64_t impno, 
+            np.ndarray[int64_t] ext_ids):
         """
         srcnodes - node ids of origins
         radius - maximum range in which to search for nearby nodes
