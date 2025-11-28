@@ -67,12 +67,12 @@
 
        - name: run tests
          run: |
-           pytest tests \
+           coverage run -m pytest tests \
            -v \
            -r a \
            -n 0 \
            --color yes \
-           --cov pandarm \
+           --cov=pandarm \
            --cov-append \
            --cov-report term-missing \
            --cov-report xml
