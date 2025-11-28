@@ -107,7 +107,7 @@ cdef class cyaccess:
         self,
         double maxdist,
         int maxitems,
-        string category,
+        str category,
         np.ndarray[int64_t] node_ids
     ):
         """
