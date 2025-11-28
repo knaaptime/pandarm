@@ -35,28 +35,44 @@ cdef extern from "accessibility.h" namespace "MTC::accessibility":
         void precomputeRangeQueries(double)
 
 
-cdef np.ndarray[double] convert_vector_to_array_dbl(vector[double] vec):
-    cdef np.ndarray arr = np.zeros(len(vec), dtype="double")
-    for i in range(len(vec)):
+cdef np.ndarray[np.float64_t, ndim=1] convert_vector_to_array_dbl(vector[double] vec):
+    cdef Py_ssize_t n = vec.size()
+    cdef np.ndarray[np.float64_t, ndim=1] arr = np.zeros(n, dtype=np.float64)
+    cdef Py_ssize_t i
+
+    for i in range(n):
         arr[i] = vec[i]
+
     return arr
 
+cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(vector[vector[double]] vec):
+    cdef Py_ssize_t nrows = vec.size()
+    if nrows == 0:
+        return np.empty((0, 0), dtype=np.double)
 
-cdef np.ndarray[double, ndim = 2] convert_2D_vector_to_array_dbl(
-        vector[vector[double]] vec):
-    cdef np.ndarray arr = np.empty_like(vec, dtype="double")
-    for i in range(arr.shape[0]):
-        for j in range(arr.shape[1]):
-            arr[i][j] = vec[i][j]
+    cdef Py_ssize_t ncols = vec[0].size()
+    cdef np.ndarray[double, ndim=2] arr = np.empty((nrows, ncols), dtype=np.double)
+    
+    cdef Py_ssize_t i, j
+    for i in range(nrows):
+        for j in range(ncols):
+            arr[i, j] = vec[i][j]
+
     return arr
 
+cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(vector[vector[int32_t]] vec):
+    cdef Py_ssize_t nrows = vec.size()
+    if nrows == 0:
+        return np.empty((0, 0), dtype=np.int64)
 
-cdef np.ndarray[int64_t, ndim = 2] convert_2D_vector_to_array_int(
-        vector[vector[int32_t]] vec):
-    cdef np.ndarray arr = np.empty_like(vec, dtype=np.int64)
-    for i in range(arr.shape[0]):
-        for j in range(arr.shape[1]):
-            arr[i][j] = vec[i][j]
+    cdef Py_ssize_t ncols = vec[0].size()
+    cdef np.ndarray[int64_t, ndim=2] arr = np.empty((nrows, ncols), dtype=np.int64)
+    
+    cdef Py_ssize_t i, j
+    for i in range(nrows):
+        for j in range(ncols):
+            arr[i, j] = vec[i][j]
+
     return arr
 
 
