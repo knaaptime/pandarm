@@ -1,10 +1,10 @@
 #pragma once
 #ifdef _WIN32
-    #define DLLImport __declspec(dllimport)
-    #define DLLExport __declspec(dllexport)
+#define DLLImport __declspec(dllimport)
+#define DLLExport __declspec(dllexport)
 #else
-    #define DLLImport
-    #define DLLExport
+#define DLLImport
+#define DLLExport
 #endif
 #ifdef _OPENMP
 #include <omp.h>

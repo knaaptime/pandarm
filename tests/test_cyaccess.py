@@ -62,7 +62,7 @@ def test_agg_analysis(net, nodes_and_edges):
     ret = net.get_all_aggregate_accessibility_variables(10, b'test', b'this is', b'bogus')
     assert np.all(np.isnan(ret))
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="This test does not run on macOS.")
+#@pytest.mark.skipif(sys.platform == "darwin", reason="This test does not run on macOS.")
 def test_poi_analysis(net, nodes_and_edges):
     nodes = nodes_and_edges[0]
     NUM_NODES = 30

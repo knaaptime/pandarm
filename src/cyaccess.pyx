@@ -18,20 +18,20 @@ np.import_array()
 
 cdef extern from "accessibility.h" namespace "MTC::accessibility":
     cdef cppclass Accessibility:
-        Accessibility(int64_t, vector[vector[long]], vector[vector[double]], bool) except +
+        Accessibility(int64_t, vector[vector[int64_t]], vector[vector[double]], bool) except +
         vector[string] aggregations
         vector[string] decays
-        void initializeCategory(double, int64_t, string, vector[long])
-        pair[vector[vector[double]], vector[vector[int32_t]]] findAllNearestPOIs(
+        void initializeCategory(double, int64_t, string, vector[int64_t])
+        pair[vector[vector[double]], vector[vector[int64_t]]] findAllNearestPOIs(
             float, int64_t, string, int64_t)
-        void initializeAccVar(string, vector[long], vector[double])
+        void initializeAccVar(string, vector[int64_t], vector[double])
         vector[double] getAllAggregateAccessibilityVariables(
             float, string, string, string, int64_t)
-        vector[int32_t] Route(int64_t, int64_t, int64_t)
-        vector[vector[int32_t]] Routes(vector[long], vector[long], int64_t)
+        vector[int64_t] Route(int64_t, int64_t, int64_t)
+        vector[vector[int64_t]] Routes(vector[int64_t], vector[int64_t], int64_t)
         double Distance(int64_t, int64_t, int64_t)
-        vector[double] Distances(vector[long], vector[long], int64_t)
-        vector[vector[pair[long, float]]] Range(vector[long], float, int64_t, vector[long])
+        vector[double] Distances(vector[int64_t], vector[int64_t], int64_t)
+        vector[vector[pair[int64_t, float]]] Range(vector[int64_t], float, int64_t, vector[int64_t])
         void precomputeRangeQueries(double)
 
 
@@ -52,7 +52,7 @@ cdef np.ndarray[double, ndim = 2] convert_2D_vector_to_array_dbl(
 
 
 cdef np.ndarray[int64_t, ndim = 2] convert_2D_vector_to_array_int(
-        vector[vector[int32_t]] vec):
+        vector[vector[int64_t]] vec):
     cdef np.ndarray arr = np.empty_like(vec, dtype=np.int64)
     for i in range(arr.shape[0]):
         for j in range(arr.shape[1]):
@@ -200,7 +200,7 @@ cdef class cyaccess:
     def precompute_range(self, double radius):
         self.access.precomputeRangeQueries(radius)
 
-    def nodes_in_range(self, vector[long] srcnodes, float radius, int64_t impno, 
+    def nodes_in_range(self, vector[int64_t] srcnodes, float radius, int64_t impno, 
             np.ndarray[int64_t] ext_ids):
         """
         srcnodes - node ids of origins
