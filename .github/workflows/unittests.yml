@@ -70,7 +70,6 @@
            pytest tests \
            -v \
            -r a \
-           -n 0 \
            --color yes \
            --cov=pandarm \
            --cov-append \
