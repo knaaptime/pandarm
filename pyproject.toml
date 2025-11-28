@@ -65,7 +65,7 @@ ignore = ["E226","E402"]
 line-length = 100
 
 [tool.coverage.run]
-source = ["./geosnap"]
+source = ["./pandarm"]
 
 [tool.coverage.report]
 exclude_lines = [
