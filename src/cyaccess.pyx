@@ -1,4 +1,5 @@
 #cython: language_level=3
+# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport cython
 from libcpp cimport bool
@@ -42,21 +43,40 @@ cdef np.ndarray[double] convert_vector_to_array_dbl(vector[double] vec):
     return arr
 
 
-cdef np.ndarray[double, ndim = 2] convert_2D_vector_to_array_dbl(
+cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(
         vector[vector[double]] vec):
-    cdef np.ndarray arr = np.empty_like(vec, dtype="double")
-    for i in range(arr.shape[0]):
-        for j in range(arr.shape[1]):
-            arr[i][j] = vec[i][j]
+
+    cdef Py_ssize_t rows = vec.size()
+    cdef Py_ssize_t cols = 0
+    if rows > 0:
+        cols = vec[0].size()
+
+    cdef np.ndarray[double, ndim=2] arr = np.empty((rows, cols), dtype=np.double)
+
+    cdef Py_ssize_t i, j
+    for i in range(rows):
+        for j in range(cols):
+            arr[i, j] = vec[i][j]
+
     return arr
 
 
-cdef np.ndarray[int64_t, ndim = 2] convert_2D_vector_to_array_int(
+
+cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(
         vector[vector[int64_t]] vec):
-    cdef np.ndarray arr = np.empty_like(vec, dtype=np.int64)
-    for i in range(arr.shape[0]):
-        for j in range(arr.shape[1]):
-            arr[i][j] = vec[i][j]
+
+    cdef Py_ssize_t rows = vec.size()
+    cdef Py_ssize_t cols = 0
+    if rows > 0:
+        cols = vec[0].size()
+
+    cdef np.ndarray[int64_t, ndim=2] arr = np.empty((rows, cols), dtype=np.int64)
+
+    cdef Py_ssize_t i, j
+    for i in range(rows):
+        for j in range(cols):
+            arr[i, j] = vec[i][j]
+
     return arr
 
 
