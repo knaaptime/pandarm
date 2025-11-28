@@ -1,5 +1,5 @@
 #cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+#cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport cython
 from libcpp cimport bool
@@ -11,11 +11,6 @@ from libc.stdint cimport int32_t, int64_t
 import numpy as np
 cimport numpy as np
 np.import_array()
-
-# resources
-# http://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html
-# http://www.birving.com/blog/2014/05/13/passing-numpy-arrays-between-python-and/
-
 
 cdef extern from "accessibility.h" namespace "MTC::accessibility":
     cdef cppclass Accessibility:
@@ -37,15 +32,15 @@ cdef extern from "accessibility.h" namespace "MTC::accessibility":
 
 
 cdef np.ndarray[double] convert_vector_to_array_dbl(vector[double] vec):
-    cdef np.ndarray arr = np.zeros(len(vec), dtype="double")
-    for i in range(len(vec)):
+    cdef Py_ssize_t n = vec.size()
+    cdef np.ndarray[double] arr = np.empty(n, dtype=np.double)
+    cdef Py_ssize_t i
+    for i in range(n):
         arr[i] = vec[i]
     return arr
 
 
-cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(
-        vector[vector[double]] vec):
-
+cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(vector[vector[double]] vec):
     cdef Py_ssize_t rows = vec.size()
     cdef Py_ssize_t cols = 0
     if rows > 0:
@@ -61,10 +56,7 @@ cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(
     return arr
 
 
-
-cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(
-        vector[vector[int64_t]] vec):
-
+cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(vector[vector[int64_t]] vec):
     cdef Py_ssize_t rows = vec.size()
     cdef Py_ssize_t cols = 0
     if rows > 0:
@@ -81,7 +73,7 @@ cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(
 
 
 cdef class cyaccess:
-    cdef Accessibility * access
+    cdef Accessibility *access
 
     def __cinit__(
         self,
@@ -92,16 +84,9 @@ cdef class cyaccess:
         bool twoway=True
     ):
         """
-        node_ids: vector of node identifiers
-        node_xys: the spatial locations of the same nodes
-        edges: a pair of node ids which comprise each edge
-        edge_weights: the weights (impedances) that apply to each edge
-        twoway: whether the edges should all be two-way or whether they
-            are directed from the first to the second node
+        Construct the Accessibility network. node_ids and node_xys are unused,
+        but retained for compatibility.
         """
-        # you're right, neither the node ids nor the location xys are used in here
-        # anymore - I'm hesitant to out-and-out remove it as we might still use
-        # it for something someday
         self.access = new Accessibility(len(node_ids), edges, edge_weights, twoway)
 
     def __dealloc__(self):
@@ -114,15 +99,14 @@ cdef class cyaccess:
         string category,
         np.ndarray[int64_t] node_ids
     ):
-        """
-        maxdist - the maximum distance that will later be used in
-            find_all_nearest_pois
-        maxitems - the maximum number of items that will later be requested
-            in find_all_nearest_pois
-        category - the category name
-        node_ids - an array of nodeids which are locations where this poi occurs
-        """
-        self.access.initializeCategory(maxdist, maxitems, category, node_ids)
+        cdef vector[int64_t] v_ids
+        v_ids.reserve(node_ids.shape[0])
+
+        cdef Py_ssize_t i
+        for i in range(node_ids.shape[0]):
+            v_ids.push_back(<int64_t> node_ids[i])
+
+        self.access.initializeCategory(maxdist, maxitems, category, v_ids)
 
     def find_all_nearest_pois(
         self,
@@ -131,18 +115,12 @@ cdef class cyaccess:
         string category,
         int64_t impno=0
     ):
-        """
-        radius - search radius
-        num_of_pois - number of pois to search for
-        category - the category name
-        impno - the impedance id to use
-        return_nodeids - whether to return the nodeid locations of the nearest
-            not just the distances
-        """
         ret = self.access.findAllNearestPOIs(radius, num_of_pois, category, impno)
 
-        return convert_2D_vector_to_array_dbl(ret.first),\
-            convert_2D_vector_to_array_int(ret.second)
+        out_dists = convert_2D_vector_to_array_dbl(ret.first)
+        out_ids   = convert_2D_vector_to_array_int(ret.second)
+
+        return out_dists, out_ids
 
     def initialize_access_var(
         self,
@@ -150,12 +128,19 @@ cdef class cyaccess:
         np.ndarray[int64_t] node_ids,
         np.ndarray[double] values
     ):
-        """
-        category - category name
-        node_ids: vector of node identifiers
-        values: vector of values that are location at the nodes
-        """
-        self.access.initializeAccVar(category, node_ids, values)
+        cdef vector[int64_t] v_ids
+        v_ids.reserve(node_ids.shape[0])
+
+        cdef Py_ssize_t i
+        for i in range(node_ids.shape[0]):
+            v_ids.push_back(<int64_t> node_ids[i])
+
+        cdef vector[double] v_vals
+        v_vals.reserve(values.shape[0])
+        for i in range(values.shape[0]):
+            v_vals.push_back(<double> values[i])
+
+        self.access.initializeAccVar(category, v_ids, v_vals)
 
     def get_available_aggregations(self):
         return self.access.aggregations
@@ -171,61 +156,71 @@ cdef class cyaccess:
         decay,
         int64_t impno=0,
     ):
-        """
-        radius - search radius
-        category - category name
-        aggtyp - aggregation type, see docs
-        decay - decay type, see docs
-        impno - the impedance id to use
-        """
         ret = self.access.getAllAggregateAccessibilityVariables(
             radius, category, aggtyp, decay, impno)
 
         return convert_vector_to_array_dbl(ret)
 
     def shortest_path(self, int64_t srcnode, int64_t destnode, int64_t impno=0):
-        """
-        srcnode - node id origin
-        destnode - node id destination
-        impno - the impedance id to use
-        """
         return self.access.Route(srcnode, destnode, impno)
 
-    def shortest_paths(self, np.ndarray[int64_t] srcnodes, 
-            np.ndarray[int64_t] destnodes, int64_t impno=0):
-        """
-        srcnodes - node ids of origins
-        destnodes - node ids of destinations
-        impno - impedance id
-        """
-        return self.access.Routes(srcnodes, destnodes, impno)
+    def shortest_paths(
+        self,
+        np.ndarray[int64_t] srcnodes,
+        np.ndarray[int64_t] destnodes,
+        int64_t impno=0
+    ):
+        cdef vector[int64_t] v_src
+        v_src.reserve(srcnodes.shape[0])
+        cdef Py_ssize_t i
+        for i in range(srcnodes.shape[0]):
+            v_src.push_back(<int64_t> srcnodes[i])
+
+        cdef vector[int64_t] v_dest
+        v_dest.reserve(destnodes.shape[0])
+        for i in range(destnodes.shape[0]):
+            v_dest.push_back(<int64_t> destnodes[i])
+
+        return self.access.Routes(v_src, v_dest, impno)
 
     def shortest_path_distance(self, int64_t srcnode, int64_t destnode, int64_t impno=0):
-        """
-        srcnode - node id origin
-        destnode - node id destination
-        impno - the impedance id to use
-        """
         return self.access.Distance(srcnode, destnode, impno)
 
-    def shortest_path_distances(self, np.ndarray[int64_t] srcnodes, 
-            np.ndarray[int64_t] destnodes, int64_t impno=0):
-        """
-        srcnodes - node ids of origins
-        destnodes - node ids of destinations
-        impno - impedance id
-        """
-        return self.access.Distances(srcnodes, destnodes, impno)
-    
+    def shortest_path_distances(
+        self,
+        np.ndarray[int64_t] srcnodes,
+        np.ndarray[int64_t] destnodes,
+        int64_t impno=0
+    ):
+        cdef vector[int64_t] v_src
+        v_src.reserve(srcnodes.shape[0])
+        cdef Py_ssize_t i
+
+        for i in range(srcnodes.shape[0]):
+            v_src.push_back(<int64_t> srcnodes[i])
+
+        cdef vector[int64_t] v_dest
+        v_dest.reserve(destnodes.shape[0])
+        for i in range(destnodes.shape[0]):
+            v_dest.push_back(<int64_t> destnodes[i])
+
+        return self.access.Distances(v_src, v_dest, impno)
+
     def precompute_range(self, double radius):
         self.access.precomputeRangeQueries(radius)
 
-    def nodes_in_range(self, vector[int64_t] srcnodes, float radius, int64_t impno, 
-            np.ndarray[int64_t] ext_ids):
-        """
-        srcnodes - node ids of origins
-        radius - maximum range in which to search for nearby nodes
-        impno - the impedance id to use
-        ext_ids - all node ids in the network
-        """
-        return self.access.Range(srcnodes, radius, impno, ext_ids)
+    def nodes_in_range(
+        self,
+        vector[int64_t] srcnodes,
+        float radius,
+        int64_t impno,
+        np.ndarray[int64_t] ext_ids
+    ):
+        cdef vector[int64_t] v_ext
+        v_ext.reserve(ext_ids.shape[0])
+
+        cdef Py_ssize_t i
+        for i in range(ext_ids.shape[0]):
+            v_ext.push_back(<int64_t> ext_ids[i])
+
+        return self.access.Range(srcnodes, radius, impno, v_ext)
