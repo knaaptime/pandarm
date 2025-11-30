@@ -101,13 +101,9 @@ def get_network_from_gdf(
         node_x=n["x"],
         node_y=n["y"],
         twoway=twoway,
+        edge_geom=e.geometry,
+        crs=output_crs 
     )
-    # keep the geometries on hand, since we have them already
-    net.edges_df = gpd.GeoDataFrame(net.edges_df, geometry=e.geometry, crs=output_crs)
-    net.nodes_df = gpd.GeoDataFrame(
-        net.nodes_df, geometry=gpd.points_from_xy(net.nodes_df.x, net.nodes_df.y), crs=output_crs
-    )
-
     return net
 
 

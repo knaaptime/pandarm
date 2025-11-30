@@ -3,9 +3,7 @@ import tempfile
 
 import pandas as pd
 import pytest
-
-from pandas.testing import assert_frame_equal
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 from pandarm import Network
 from pandarm.loaders import pandash5 as ph5
@@ -79,6 +77,7 @@ def test_remove_nodes(network, rm_nodes):
     # node 6 is connected to nodes 2, 5, and 10,
     #     which all have other connections
     nodes, edges = ph5.remove_nodes(network, rm_nodes)
+    nodes = nodes.drop(columns='geometry')
 
     exp_nodes = pd.DataFrame(
         {'x': [2, 3, 4, 1, 2, 1, 2, 3, 4],
@@ -119,7 +118,7 @@ def test_network_to_pandas_hdf5_removal(
 
     store = pd.HDFStore(tmpfile)
 
-    assert_frame_equal(store['nodes'], nodes)
+    assert_frame_equal(store['nodes'], nodes.drop(columns='geometry'))
     assert_frame_equal(store['edges'], edges)
     assert_series_equal(store['two_way'], pd.Series([two_way]))
     assert_series_equal(
@@ -131,8 +130,9 @@ def test_network_from_pandas_hdf5(
         tmpfile, network, nodes, edges_df, impedance_names, two_way):
     ph5.network_to_pandas_hdf5(network, tmpfile)
     new_net = ph5.network_from_pandas_hdf5(Network, tmpfile)
+    new_net.nodes_df = new_net.nodes_df
 
-    assert_frame_equal(new_net.nodes_df, nodes)
+    assert_frame_equal(new_net.nodes_df.drop(columns="geometry"), nodes)
     assert_frame_equal(new_net.edges_df, edges_df)
     assert new_net._twoway == two_way
     assert new_net.impedance_names == impedance_names
@@ -145,6 +145,7 @@ def test_network_save_load_hdf5(
     new_net = Network.from_hdf5(tmpfile)
 
     nodes, edges = ph5.remove_nodes(network, rm_nodes)
+    new_net.nodes_df = new_net.nodes_df
 
     assert_frame_equal(new_net.nodes_df, nodes)
     assert_frame_equal(new_net.edges_df, edges)

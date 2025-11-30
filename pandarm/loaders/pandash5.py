@@ -1,4 +1,6 @@
+import geopandas as gpd
 import pandas as pd
+from shapely.io import from_wkb, to_wkb
 
 
 def remove_nodes(network, rm_nodes):
@@ -46,11 +48,13 @@ def network_to_pandas_hdf5(network, filename, rm_nodes=None):
         nodes, edges = network.nodes_df, network.edges_df
 
     with pd.HDFStore(filename, mode="w") as store:
-        store["nodes"] = nodes
+        store["nodes"] = nodes.drop(columns="geometry")
+        if isinstance(edges, gpd.GeoDataFrame):
+            edges["geometry"] = edges[edges.geometry.name].apply(to_wkb)
         store["edges"] = edges
-
         store["two_way"] = pd.Series([network._twoway])
         store["impedance_names"] = pd.Series(network.impedance_names)
+        store["crs"] = pd.Series([network.crs])
 
 
 def network_from_pandas_hdf5(cls, filename):
@@ -71,7 +75,22 @@ def network_from_pandas_hdf5(cls, filename):
     with pd.HDFStore(filename) as store:
         nodes = store["nodes"]
         edges = store["edges"]
+        crs = store['crs'].values[0] if 'crs' in store.keys() else None
+        if "geometry" in edges.columns:
+            edges["geometry"] = gpd.GeoSeries(edges["geometry"].apply(from_wkb), crs=crs)
+            edge_geom = "geometry"
         two_way = store["two_way"][0]
         imp_names = store["impedance_names"].tolist()
+        edge_geom = edges.geometry if 'geometry' in edges.columns.values else None
+        
 
-    return cls(nodes["x"], nodes["y"], edges["from"], edges["to"], edges[imp_names], twoway=two_way)
+    return cls(
+        nodes["x"],
+        nodes["y"],
+        edges["from"],
+        edges["to"],
+        edges[imp_names],
+        twoway=two_way,
+        edge_geom=edge_geom,
+        crs=crs,
+    )

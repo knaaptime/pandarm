@@ -35,9 +35,9 @@ cdef extern from "accessibility.h" namespace "MTC::accessibility":
 
 
 cdef np.ndarray[double] convert_vector_to_array_dbl(vector[double] vec):
-    cdef int n = vec.size()
+    cdef int64_t n = vec.size()
     cdef np.ndarray[double] arr = np.zeros(n, dtype=np.float64)
-    cdef int i
+    cdef int64_t i
     for i in range(n):
         arr[i] = vec[i]
     return arr
@@ -48,11 +48,11 @@ cdef np.ndarray[double, ndim=2] convert_2D_vector_to_array_dbl(
     if vec.size() == 0:
         return np.empty((0, 0), dtype=np.float64)
     
-    cdef int rows = vec.size()
-    cdef int cols = vec[0].size() if rows > 0 else 0
+    cdef int64_t rows = vec.size()
+    cdef int64_t cols = vec[0].size() if rows > 0 else 0
     cdef np.ndarray[double, ndim=2] arr = np.empty((rows, cols), dtype=np.float64)
     
-    cdef int i, j
+    cdef int64_t i, j
     for i in range(rows):
         if vec[i].size() != cols:
             raise ValueError(f"Inconsistent row sizes: expected {cols}, got {vec[i].size()} at row {i}")
@@ -66,11 +66,11 @@ cdef np.ndarray[int64_t, ndim=2] convert_2D_vector_to_array_int(
     if vec.size() == 0:
         return np.empty((0, 0), dtype=np.int64)
     
-    cdef int rows = vec.size()
-    cdef int cols = vec[0].size() if rows > 0 else 0
+    cdef int64_t rows = vec.size()
+    cdef int64_t cols = vec[0].size() if rows > 0 else 0
     cdef np.ndarray[int64_t, ndim=2] arr = np.empty((rows, cols), dtype=np.int64)
     
-    cdef int i, j
+    cdef int64_t i, j
     for i in range(rows):
         if vec[i].size() != cols:
             raise ValueError(f"Inconsistent row sizes: expected {cols}, got {vec[i].size()} at row {i}")
