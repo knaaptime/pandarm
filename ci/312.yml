@@ -9,6 +9,7 @@ dependencies:
   - pytables >=3.1
   - geopandas >=1.1
   - cxx-compiler  # platform-appropriate compiler w/ OpenMP
+  - osmnx
 
   # testing, etc
   - codecov
@@ -18,3 +19,10 @@ dependencies:
   - pytest-xdist
   - twine
 
+  # docs
+  - nbsphinx
+  - numpydoc
+  - sphinx
+  - sphinxcontrib-bibtex
+  - sphinx_bootstrap_theme
+  - myst-parser
