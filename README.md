@@ -15,15 +15,15 @@ See more in the [example notebook](examples/example_notebook.ipynb)
 
 ### Aggregations
 
-![Access to Restaurants in D.C.](docs/source/img/dc_restaurants.png)
+![Access to Restaurants in D.C.](docs/img/dc_restaurants.png)
 
 ### Shortest Path
 
-![Shortest Path from UCI School of Social Ecology to Rancho San Joaquin M.S.](docs/source/img/sse_path.png)
+![Shortest Path from UCI School of Social Ecology to Rancho San Joaquin M.S.](docs/img/sse_path.png)
 
 ### Isochrones
 
-![Destinations Within 2km of UCI Langson Library](docs/source/img/langson_iso.png)
+![Destinations Within 2km of UCI Langson Library](docs/img/langson_iso.png)
 
 
 ## Installation
