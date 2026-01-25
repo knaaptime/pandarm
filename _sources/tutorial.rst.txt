@@ -3,7 +3,7 @@ Tutorial
 
 .. note::
     This tutorial was last updated in 2017 and may not be current. The best place
-    to start is with the pandarm `demo notebook 
+    to start is with the pandarm `demo notebook
     <https://github.com/oturns/pandarm/tree/master/examples/example-notebook.ipynb>`_.
 
 At this point it is probably helpful to make concrete the topics discussed in
@@ -162,7 +162,8 @@ For this reason, the workflow is typically to map the variables x and y to
 node_ids (which can then be cached or written to disk at a later date) and
 to call ``set`` for each data column, potentially several times.  For instance,
 if you have a DataFrame of buildings with x and y coordinates,
-you can use ``get_node_ids`` to set node_ids as an attribute on the
+you can use ``get_node_ids`` to retrieve the nearest node ID to be assigned as an
+attribute on the
 buildings table and then ``set`` can be called many times with all the
 attributes of the buildings table and their associated column names. ::
 
