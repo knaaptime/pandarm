@@ -89,9 +89,13 @@ using Int2D = nb::ndarray<int64_t, nb::numpy, nb::shape<-1, -1>>;
 using Dbl2D = nb::ndarray<double, nb::numpy, nb::shape<-1, -1>>;
 
 static auto vec_to_array_1d_dbl(const std::vector<double>& vec) {
-    double* data = const_cast<double*>(vec.data());
-    nb::capsule cap(data, [](void*) noexcept {});  // prevent free; lifetime tied to vec
-    return DblArr(data, {static_cast<size_t>(vec.size())}, std::move(cap));
+    // Copy into a heap-allocated buffer with a proper capsule destructor.
+    // The previous version borrowed vec.data() with a no-op capsule, which
+    // caused use-after-free when the local vec was destroyed on return.
+    double* buf = new double[vec.size()];
+    std::copy_n(vec.data(), vec.size(), buf);
+    nb::capsule cap(buf, [](void* p) noexcept { delete[] static_cast<double*>(p); });
+    return DblArr(buf, {static_cast<size_t>(vec.size())}, std::move(cap));
 }
 
 static auto vec2d_to_array_dbl(const std::vector<std::vector<double>>& vec) {
