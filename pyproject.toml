@@ -7,10 +7,12 @@ requires = [
     "scikit-build-core>=0.10",
     "setuptools_scm[toml]>=8",
     "nanobind>=2.0",
+    "numpy>=2.0",
 ]
 
 [tool.scikit-build]
 minimum-version = "0.10"
+cmake.build-type = "Release"
 # Ship the setuptools-scm generated _version.py in the wheel
 sdist.include = ["pandarm/_version.py"]
 # Tell CMake where to find the package (pandarm/ sits at repo root)
@@ -38,8 +40,8 @@ dependencies = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Affero General Public License v3"
 ]
+license = "AGPL-3.0-only"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 
